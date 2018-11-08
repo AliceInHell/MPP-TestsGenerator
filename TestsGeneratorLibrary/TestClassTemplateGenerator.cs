@@ -126,16 +126,6 @@ namespace TestsGeneratorLibrary
             return GetMethodDeclaration("Test", $"{methodInfo.Name}Test", List(blockMembers));
         }
 
-        private AssignmentExpressionSyntax GetAssignmentExpression(string identifier, ExpressionSyntax right)
-        {
-            AssignmentExpressionSyntax assignmentExpression = AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                IdentifierName(identifier),
-                right);
-
-            return assignmentExpression;
-        }
-
         private MemberAccessExpressionSyntax GetMemberAccessExpression(string objectName, string memberName)
         {
             return MemberAccessExpression(
