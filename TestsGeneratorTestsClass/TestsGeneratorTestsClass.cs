@@ -1,47 +1,126 @@
 ﻿using System;
+using System.IO;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestsGeneratorLibrary;
+using System.Linq;
 
 namespace TestsGeneratorUnitTests
 {
     [TestClass]
     public class TestsGeneratorTestsClass
     {
-        private int readingTasksCount;
-        private int writingTasksCount;
+        private int _readingTasksCount;
+        private int _writingTasksCount;
 
-        private TestGeneratorConfig config;
+        private TestGeneratorConfig _config;
 
-        private string outputDirectory;
-        private List<string> paths;
+        private string _outputDirectory;
+        private List<string> _paths;
+        private string _programmText;
 
-        private ParallelCodeReader reader;
-        private CodeWriter writer;
+        private ParallelCodeReader _reader;
+        private CodeWriter _writer;
 
-        private TestsGenerator generator;
+        private TestsGenerator _generator;
+
+        private CompilationUnitSyntax _compilationUnitSyntax;
 
         [TestInitialize]
         public void SetUp()
         {
-            readingTasksCount = 3;
-            writingTasksCount = 3;
-            config = new TestGeneratorConfig(readingTasksCount, writingTasksCount);
+            _readingTasksCount = 1;
+            _writingTasksCount = 1;
+            _config = new TestGeneratorConfig(_readingTasksCount, _writingTasksCount);
 
-            outputDirectory = @"./";
+            _outputDirectory = @"./";
 
-            paths = new List<string>();
-            paths.Add(@"./someClass.cs");
+            _paths = new List<string>();
+            _paths.Add(@"./SomeClass.cs");
 
-            reader = new ParallelCodeReader(paths, readingTasksCount);
-            writer = new CodeWriter(outputDirectory);
+            _reader = new ParallelCodeReader(_paths, _readingTasksCount);
+            _writer = new CodeWriter(_outputDirectory);
 
-            generator = new TestsGenerator(config);
+            _generator = new TestsGenerator(_config);
+            _generator.Generate(_reader, _writer);
+
+            _programmText = File.ReadAllText("@./SomeClassTests.cs");
+            SyntaxTree syntaxTree;
+            syntaxTree = CSharpSyntaxTree.ParseText(_programmText);
+
+            _compilationUnitSyntax = syntaxTree.GetCompilationUnitRoot();
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void EntireTestClassTest()
         {
+            var expected = File.ReadAllText(_paths[0]);
+            var actual = File.ReadAllText("./SomeClassTests.cs");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void UnitUsingDirectiveTest()
+        {
+            IEnumerable<UsingDirectiveSyntax> NUnitUsingDirective =
+                from usingDirective in _compilationUnitSyntax.DescendantNodes().OfType<UsingDirectiveSyntax>()
+                where usingDirective.Name.ToString() == "Microsoft.VisualStudio.TestTools.UnitTesting;"
+                select usingDirective;
+
+            Assert.IsNotNull(NUnitUsingDirective.FirstOrDefault());
+        }
+
+        [TestMethod]
+        public void SomeClassNamespaceTest()
+        {
+            IEnumerable<NamespaceDeclarationSyntax> Namespace =
+                from namespaceDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<NamespaceDeclarationSyntax>()
+                where namespaceDeclaration.Name.ToString() == "TestsGeneratorTestsClass.Tests"
+                select namespaceDeclaration;
+
+            Assert.IsNotNull(Namespace.FirstOrDefault());
+        }
+
+        [TestMethod]
+        public void SomeClassNameTest()
+        {
+            IEnumerable<ClassDeclarationSyntax> className =
+                from classDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<ClassDeclarationSyntax>()
+                where classDeclaration.Identifier.ValueText == "SomeClass"
+                select classDeclaration;
+
+            Assert.IsNotNull(className.FirstOrDefault());
+        }
+
+        [TestMethod]
+        public void TSomeClassMethodsCountTest()
+        {
+            IEnumerable<MethodDeclarationSyntax> methods =
+                from methodDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                select methodDeclaration;
+
+            Assert.IsTrue(methods.Count() == 3);
+        }
+
+        
+        [TestMethod]
+        public void SecondMethodAssertFailTest()
+        {
+            IEnumerable<MethodDeclarationSyntax> method =
+                from methodDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                where methodDeclaration.Identifier.ValueText == "SecondMethodTests"
+                select methodDeclaration;
+
+            IEnumerable<MemberAccessExpressionSyntax> asserts =
+                from assertDeclaration in method.FirstOrDefault().Body.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                where assertDeclaration.Expression.ToString() == "Assert"
+                select assertDeclaration;
+
+            Assert.IsNotNull(asserts.FirstOrDefault());
         }
     }
 }
