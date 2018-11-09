@@ -35,7 +35,7 @@ namespace TestsGeneratorLibrary
                                     AttributeList(
                                         SingletonSeparatedList(
                                             Attribute(
-                                                IdentifierName("TestFixture"))))))
+                                                IdentifierName("TestClass"))))))
                             .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
                             .WithMembers(GetClassMembers(classInfo))))));
 
@@ -123,7 +123,7 @@ namespace TestsGeneratorLibrary
                         "Fail"))
                     .WithArgumentList(args)));
 
-            return GetMethodDeclaration("Test", $"{methodInfo.Name}Test", List(blockMembers));
+            return GetMethodDeclaration("TestMethod", $"{methodInfo.Name}Test", List(blockMembers));
         }
 
         private MemberAccessExpressionSyntax GetMemberAccessExpression(string objectName, string memberName)
