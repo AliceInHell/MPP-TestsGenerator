@@ -32,14 +32,15 @@ namespace TestsGeneratorUnitTests
         [TestInitialize]
         public void SetUp()
         {
-            _readingTasksCount = 1;
-            _writingTasksCount = 1;
+            _readingTasksCount = 3;
+            _writingTasksCount = 3;
             _config = new TestGeneratorConfig(_readingTasksCount, _writingTasksCount);
 
-            _outputDirectory = @"./";
+            _outputDirectory = "./";
 
             _paths = new List<string>();
-            _paths.Add(@"./SomeClass.cs");
+            _paths.Add("./SomeClass.cs");
+            _paths.Add("./AnotherClass.cs");
 
             _reader = new ParallelCodeReader(_paths, _readingTasksCount);
             _writer = new CodeWriter(_outputDirectory);
@@ -47,7 +48,7 @@ namespace TestsGeneratorUnitTests
             _generator = new TestsGenerator(_config);
             _generator.Generate(_reader, _writer);
 
-            _programmText = File.ReadAllText("@./SomeClassTests.cs");
+            _programmText = File.ReadAllText("./SomeClassTests.cs");
             SyntaxTree syntaxTree;
             syntaxTree = CSharpSyntaxTree.ParseText(_programmText);
 
@@ -55,20 +56,11 @@ namespace TestsGeneratorUnitTests
         }
 
         [TestMethod]
-        public void EntireTestClassTest()
-        {
-            var expected = File.ReadAllText(_paths[0]);
-            var actual = File.ReadAllText("./SomeClassTests.cs");
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
         public void UnitUsingDirectiveTest()
         {
             IEnumerable<UsingDirectiveSyntax> NUnitUsingDirective =
                 from usingDirective in _compilationUnitSyntax.DescendantNodes().OfType<UsingDirectiveSyntax>()
-                where usingDirective.Name.ToString() == "Microsoft.VisualStudio.TestTools.UnitTesting;"
+                where usingDirective.Name.ToString() == "Microsoft.VisualStudio.TestTools.UnitTesting"
                 select usingDirective;
 
             Assert.IsNotNull(NUnitUsingDirective.FirstOrDefault());
@@ -90,7 +82,7 @@ namespace TestsGeneratorUnitTests
         {
             IEnumerable<ClassDeclarationSyntax> className =
                 from classDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                where classDeclaration.Identifier.ValueText == "SomeClass"
+                where classDeclaration.Identifier.ValueText == "SomeClassTests"
                 select classDeclaration;
 
             Assert.IsNotNull(className.FirstOrDefault());
@@ -112,7 +104,7 @@ namespace TestsGeneratorUnitTests
         {
             IEnumerable<MethodDeclarationSyntax> method =
                 from methodDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                where methodDeclaration.Identifier.ValueText == "SecondMethodTests"
+                where methodDeclaration.Identifier.ValueText == "SecondMethodTest"
                 select methodDeclaration;
 
             IEnumerable<MemberAccessExpressionSyntax> asserts =
