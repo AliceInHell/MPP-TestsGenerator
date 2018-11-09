@@ -18,14 +18,6 @@ namespace TestsGeneratorLibrary
             _maxReadingTasksCount = new ParallelOptions { MaxDegreeOfParallelism = maxReadingTasksCount };
         }
 
-        public int Count
-        {
-            get
-            {
-                return _filePaths.Count();
-            }
-        }
-
         public IEnumerable<string> Provide()
         {
             List<string> codeBuffer = new List<string>();
