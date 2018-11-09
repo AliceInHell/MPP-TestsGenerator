@@ -35,12 +35,7 @@ namespace TestsGeneratorLibrary
             Parallel.ForEach(reader.Provide(), async generatedClass => {
                 await producerBuffer.SendAsync(generatedClass);
             });
-
-            if (reader.Count == 1)
-            {
-                generatedTestsBuffer.Completion.Wait();
-            }
-
+           
             producerBuffer.Complete();            
         }
 
