@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace TestsGeneratorLibrary.Structures
 {
-    class GeneratedTestClass
+    public class GeneratedTestClass
     {
+        public string TestClassName { get; }
+        public string TestClassData { get; }
+
+        public GeneratedTestClass(string testClassName, string testClassData)
+        {
+            TestClassName = testClassName;
+            TestClassData = testClassData;
+        }
     }
 }
