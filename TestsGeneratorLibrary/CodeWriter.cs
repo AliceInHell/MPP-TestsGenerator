@@ -8,11 +8,11 @@ using TestsGeneratorLibrary.Structures;
 
 namespace TestsGeneratorLibrary
 {
-    public class ParallelCodeWriter
+    public class CodeWriter
     {
         private readonly string _outputDirectoryPath;
 
-        public ParallelCodeWriter(string outputDirectoryPath)
+        public CodeWriter(string outputDirectoryPath)
         {
             _outputDirectoryPath = outputDirectoryPath;
 

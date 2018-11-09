@@ -17,7 +17,7 @@ namespace TestsGeneratorLibrary
             _testsGeneratorConfig = testsGeneratorConfig;
         }
 
-        public void Generate<TResultPayload>(ParallelCodeReader reader, ParallelCodeWriter writer)
+        public void Generate(ParallelCodeReader reader, CodeWriter writer)
         {
             DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
             ExecutionDataflowBlockOptions processingTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxProcessingTasksCount };
