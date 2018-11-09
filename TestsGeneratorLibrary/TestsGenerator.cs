@@ -36,7 +36,11 @@ namespace TestsGeneratorLibrary
                 await producerBuffer.SendAsync(generatedClass);
             });
 
-            generatedTestsBuffer.Completion.Wait();
+            if (reader.Count == 1)
+            {
+                generatedTestsBuffer.Completion.Wait();
+            }
+
             producerBuffer.Complete();            
         }
 
