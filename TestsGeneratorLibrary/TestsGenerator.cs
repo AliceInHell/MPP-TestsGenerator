@@ -36,7 +36,8 @@ namespace TestsGeneratorLibrary
                 await producerBuffer.SendAsync(generatedClass);
             });
 
-            producerBuffer.Complete();
+            generatedTestsBuffer.Completion.Wait();
+            producerBuffer.Complete();            
         }
 
         private GeneratedTestClass Produce(string sourceCode)

@@ -8,7 +8,7 @@ using TestsGeneratorLibrary.Structures;
 
 namespace TestsGeneratorLibrary
 {
-    public class TestClassTemplateGenerator
+    internal class TestClassTemplateGenerator
     {
         private readonly SyntaxTreeInfo _syntaxTreeInfo;
 
