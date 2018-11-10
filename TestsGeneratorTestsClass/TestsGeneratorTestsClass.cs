@@ -40,8 +40,8 @@ namespace TestsGeneratorUnitTests
             _outputDirectory = "./";
 
             _paths = new List<string>();
-            _paths.Add("../../SomeClass.csSource");
-            _paths.Add("../../AnotherClass.csSource");
+            _paths.Add("./SomeClass.csSource");
+            _paths.Add("./AnotherClass.csSource");
 
             _reader = new ParallelCodeReader(_paths, _readingTasksCount);
             _writer = new CodeWriter(_outputDirectory);
