@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestsGeneratorLibrary;
 using System.Linq;
+using System.Threading;
 
 namespace TestsGeneratorUnitTests
 {
@@ -39,14 +40,18 @@ namespace TestsGeneratorUnitTests
             _outputDirectory = "./";
 
             _paths = new List<string>();
-            _paths.Add("./SomeClass.cs");
-            _paths.Add("./AnotherClass.cs");
+            _paths.Add("../../SomeClass.csSource");
+            _paths.Add("../../AnotherClass.csSource");
 
             _reader = new ParallelCodeReader(_paths, _readingTasksCount);
             _writer = new CodeWriter(_outputDirectory);
 
             _generator = new TestsGenerator(_config);
             _generator.Generate(_reader, _writer);
+
+            // waiting for generation because iteration to next line is so fast,
+            // cant to find file
+            Thread.Sleep(1000);
 
             _programmText = File.ReadAllText("./SomeClassTests.cs");
             SyntaxTree syntaxTree;

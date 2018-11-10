@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TestsGeneratorTestsClass
+{
+    public class SomeClass
+    {
+        public int count;
+
+        public void FirstMethod()
+        {
+            // smth
+        }
+
+        public void SecondMethod()
+        {
+            // smth
+        }
+
+        public void ThirdMethod()
+        {
+            // smth
+        }
+
+        private void FourthMethod()
+        {
+            // smth
+        }
+    }
+}

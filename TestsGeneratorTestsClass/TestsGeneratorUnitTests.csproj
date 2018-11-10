@@ -152,8 +152,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AnotherClass.csSource" />
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="SomeClass.csSource" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.1\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
