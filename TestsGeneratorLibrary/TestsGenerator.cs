@@ -9,8 +9,7 @@ namespace TestsGeneratorLibrary
 {
     public class TestsGenerator
     {
-        private readonly TestGeneratorConfig _testsGeneratorConfig;
-        private BufferBlock<GeneratedTestClass> _additionalProducerBuffer = new BufferBlock<GeneratedTestClass>();
+        private readonly TestGeneratorConfig _testsGeneratorConfig;        
 
         public TestsGenerator(TestGeneratorConfig testsGeneratorConfig)
         {
@@ -29,14 +28,14 @@ namespace TestsGeneratorLibrary
             ActionBlock<GeneratedTestClass> resultWritingAction = new ActionBlock<GeneratedTestClass>(
                ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
 
-            producerBuffer.LinkTo(resultWritingAction, linkOptions);
-            _additionalProducerBuffer.LinkTo(resultWritingAction, linkOptions);
+            producerBuffer.LinkTo(resultWritingAction, linkOptions);            
 
             Parallel.ForEach(reader.Provide(), async generatedClass => {
                 await producerBuffer.SendAsync(generatedClass);
             });
            
-            producerBuffer.Complete();            
+            producerBuffer.Complete();
+            resultWritingAction.Completion.Wait();      
         }
 
         private GeneratedTestClass Produce(string sourceCode)

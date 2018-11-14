@@ -51,7 +51,7 @@ namespace TestsGeneratorUnitTests
 
             // waiting for generation because iteration to next line is so fast,
             // cant to find file
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
 
             _programmText = File.ReadAllText("./SomeClassTests.cs");
             SyntaxTree syntaxTree;
