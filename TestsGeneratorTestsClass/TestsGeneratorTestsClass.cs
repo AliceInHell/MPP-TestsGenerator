@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestsGeneratorLibrary;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace TestsGeneratorUnitTests
 {
@@ -27,6 +27,7 @@ namespace TestsGeneratorUnitTests
         private CodeWriter _writer;
 
         private TestsGenerator _generator;
+        private Task _task;
 
         private CompilationUnitSyntax _compilationUnitSyntax;
 
@@ -47,11 +48,10 @@ namespace TestsGeneratorUnitTests
             _writer = new CodeWriter(_outputDirectory);
 
             _generator = new TestsGenerator(_config);
-            _generator.Generate(_reader, _writer);
+            _task = _generator.Generate(_reader, _writer);
 
-            // waiting for generation because iteration to next line is so fast,
-            // cant to find file
-            //Thread.Sleep(1000);
+            _task.Start();
+            _task.Wait();
 
             _programmText = File.ReadAllText("./SomeClassTests.cs");
             SyntaxTree syntaxTree;

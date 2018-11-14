@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using TestsGeneratorLibrary.Structures;
@@ -16,26 +17,35 @@ namespace TestsGeneratorLibrary
             _testsGeneratorConfig = testsGeneratorConfig;
         }
 
-        public void Generate(ParallelCodeReader reader, CodeWriter writer)
+        public Task Generate(ParallelCodeReader reader, CodeWriter writer)
         {
-            DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
-            ExecutionDataflowBlockOptions processingTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxProcessingTasksCount };
-            ExecutionDataflowBlockOptions outputTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxWritingTasksCount };
+            return new Task(
+                () =>
+                {
+                    DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
+                    ExecutionDataflowBlockOptions processingTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxProcessingTasksCount };
+                    ExecutionDataflowBlockOptions outputTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxWritingTasksCount };
 
-            TransformBlock<string, GeneratedTestClass> producerBuffer = 
-                new TransformBlock<string, GeneratedTestClass>(new Func<string, GeneratedTestClass>(Produce), processingTaskRestriction);
+                    TransformBlock<string, GeneratedTestClass> producerBuffer =
+                        new TransformBlock<string, GeneratedTestClass>(new Func<string, GeneratedTestClass>(Produce), processingTaskRestriction);
 
-            ActionBlock<GeneratedTestClass> resultWritingAction = new ActionBlock<GeneratedTestClass>(
-               ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
+                    ActionBlock<GeneratedTestClass> resultWritingAction = new ActionBlock<GeneratedTestClass>(
+                       ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
 
-            producerBuffer.LinkTo(resultWritingAction, linkOptions);            
+                    producerBuffer.LinkTo(resultWritingAction, linkOptions);
 
-            Parallel.ForEach(reader.Provide(), async generatedClass => {
-                await producerBuffer.SendAsync(generatedClass);
-            });
-           
-            producerBuffer.Complete();
-            resultWritingAction.Completion.Wait();      
+                    Parallel.ForEach(reader.Provide(), async generatedClass =>
+                    {
+                        await producerBuffer.SendAsync(generatedClass);
+                    });
+
+                    //producerBuffer.Complete();
+                    //resultWritingAction.Completion.Wait();
+
+                    // for execution sequence check !!!
+                    //Thread.Sleep(1000);
+                    Console.WriteLine("Hello from Task!");
+                }, TaskCreationOptions.AttachedToParent);
         }
 
         private GeneratedTestClass Produce(string sourceCode)

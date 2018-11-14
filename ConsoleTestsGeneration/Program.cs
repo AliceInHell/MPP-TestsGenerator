@@ -1,11 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using TestsGeneratorLibrary;
 
 namespace ConsoleTestsGeneration
@@ -31,7 +26,12 @@ namespace ConsoleTestsGeneration
             CodeWriter writer = new CodeWriter(outputDirectory);
 
             TestsGenerator generator = new TestsGenerator(config);
-            generator.Generate(reader, writer);           
+
+            Task task = generator.Generate(reader, writer);
+            task.Start();
+            task.Wait();
+
+            Console.WriteLine("Done!");          
 
             Console.ReadLine();
         }
