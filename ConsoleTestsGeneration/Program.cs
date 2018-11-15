@@ -22,12 +22,12 @@ namespace ConsoleTestsGeneration
                 paths.Add(args[i]);
             }
 
-            ParallelCodeReader reader = new ParallelCodeReader(paths, config.MaxProcessingTasksCount);
+            CodeReader reader = new CodeReader();
             CodeWriter writer = new CodeWriter(outputDirectory);
 
             TestsGenerator generator = new TestsGenerator(config);
 
-            Task task = generator.Generate(reader, writer);
+            Task task = generator.Generate(reader, writer, paths);
             task.Start();
             task.Wait();
 

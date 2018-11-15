@@ -135,7 +135,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ParallelCodeReader.cs" />
+    <Compile Include="CodeReader.cs" />
     <Compile Include="CodeWriter.cs" />
     <Compile Include="Structures\ClassInfo.cs" />
     <Compile Include="Structures\GeneratedTestClass.cs" />

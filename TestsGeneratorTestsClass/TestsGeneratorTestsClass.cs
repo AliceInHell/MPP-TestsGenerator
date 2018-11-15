@@ -23,7 +23,7 @@ namespace TestsGeneratorUnitTests
         private List<string> _paths;
         private string _programmText;
 
-        private ParallelCodeReader _reader;
+        private CodeReader _reader;
         private CodeWriter _writer;
 
         private TestsGenerator _generator;
@@ -44,11 +44,11 @@ namespace TestsGeneratorUnitTests
             _paths.Add("./SomeClass.csSource");
             _paths.Add("./AnotherClass.csSource");
 
-            _reader = new ParallelCodeReader(_paths, _readingTasksCount);
+            _reader = new CodeReader();
             _writer = new CodeWriter(_outputDirectory);
 
             _generator = new TestsGenerator(_config);
-            _task = _generator.Generate(_reader, _writer);
+            _task = _generator.Generate(_reader, _writer, _paths);
 
             _task.Start();
             _task.Wait();

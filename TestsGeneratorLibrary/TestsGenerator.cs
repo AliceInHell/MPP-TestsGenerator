@@ -17,7 +17,7 @@ namespace TestsGeneratorLibrary
             _testsGeneratorConfig = testsGeneratorConfig;
         }
 
-        public Task Generate(ParallelCodeReader reader, CodeWriter writer)
+        public Task Generate(CodeReader reader, CodeWriter writer, List<string> source)
         {
             return new Task(
                 () =>
@@ -26,25 +26,25 @@ namespace TestsGeneratorLibrary
                     ExecutionDataflowBlockOptions processingTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxProcessingTasksCount };
                     ExecutionDataflowBlockOptions outputTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxWritingTasksCount };
 
-                    TransformBlock<string, GeneratedTestClass> producerBuffer =
+                    TransformBlock<string, string> readingBlock =
+                        new TransformBlock<string, string>(new Func<string, string>(reader.ProvideCode), processingTaskRestriction);
+
+                    TransformBlock<string, GeneratedTestClass> producingBlock =
                         new TransformBlock<string, GeneratedTestClass>(new Func<string, GeneratedTestClass>(Produce), processingTaskRestriction);
 
-                    ActionBlock<GeneratedTestClass> resultWritingAction = new ActionBlock<GeneratedTestClass>(
+                    ActionBlock<GeneratedTestClass> writingBlock = new ActionBlock<GeneratedTestClass>(
                        ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
 
-                    producerBuffer.LinkTo(resultWritingAction, linkOptions);
-
-                    Parallel.ForEach(reader.Provide(), async generatedClass =>
+                    readingBlock.LinkTo(producingBlock, linkOptions);
+                    producingBlock.LinkTo(writingBlock, linkOptions);
+                   
+                    foreach (string path in source)
                     {
-                        await producerBuffer.SendAsync(generatedClass);
-                    });
+                        readingBlock.SendAsync(path);
+                    }
 
-                    //producerBuffer.Complete();
-                    //resultWritingAction.Completion.Wait();
-
-                    // for execution sequence check !!!
-                    //Thread.Sleep(1000);
-                    Console.WriteLine("Hello from Task!");
+                    readingBlock.Complete();
+                    writingBlock.Completion.Wait();
                 }, TaskCreationOptions.AttachedToParent);
         }
 
@@ -55,7 +55,7 @@ namespace TestsGeneratorLibrary
 
             TestClassTemplateGenerator testTemplatesGenerator = new TestClassTemplateGenerator(syntaxTreeInfo);
             List<GeneratedTestClass> testTemplates = testTemplatesGenerator.GetTestTemplates().ToList();
-
+           
             return new GeneratedTestClass(testTemplates.First().TestClassName, testTemplates.First().TestClassData);
         }
     }
