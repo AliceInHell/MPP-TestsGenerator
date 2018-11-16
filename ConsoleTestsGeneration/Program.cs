@@ -27,9 +27,7 @@ namespace ConsoleTestsGeneration
 
             TestsGenerator generator = new TestsGenerator(config);
 
-            Task task = generator.Generate(reader, writer, paths);
-            task.Start();
-            task.Wait();
+            generator.Generate(reader, writer, paths).Wait();
 
             Console.WriteLine("Done!");          
 

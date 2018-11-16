@@ -19,33 +19,31 @@ namespace TestsGeneratorLibrary
 
         public Task Generate(CodeReader reader, CodeWriter writer, List<string> source)
         {
-            return new Task(
-                () =>
-                {
-                    DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
-                    ExecutionDataflowBlockOptions processingTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxProcessingTasksCount };
-                    ExecutionDataflowBlockOptions outputTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxWritingTasksCount };
 
-                    TransformBlock<string, string> readingBlock =
-                        new TransformBlock<string, string>(new Func<string, string>(reader.ProvideCode), processingTaskRestriction);
+            DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
+            ExecutionDataflowBlockOptions processingTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxProcessingTasksCount };
+            ExecutionDataflowBlockOptions outputTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxWritingTasksCount };
 
-                    TransformBlock<string, GeneratedTestClass> producingBlock =
-                        new TransformBlock<string, GeneratedTestClass>(new Func<string, GeneratedTestClass>(Produce), processingTaskRestriction);
+            TransformBlock<string, string> readingBlock =
+                new TransformBlock<string, string>(new Func<string, string>(reader.ProvideCode), processingTaskRestriction);
 
-                    ActionBlock<GeneratedTestClass> writingBlock = new ActionBlock<GeneratedTestClass>(
-                       ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
+            TransformBlock<string, GeneratedTestClass> producingBlock =
+                new TransformBlock<string, GeneratedTestClass>(new Func<string, GeneratedTestClass>(Produce), processingTaskRestriction);
 
-                    readingBlock.LinkTo(producingBlock, linkOptions);
-                    producingBlock.LinkTo(writingBlock, linkOptions);
-                   
-                    foreach (string path in source)
-                    {
-                        readingBlock.SendAsync(path);
-                    }
+            ActionBlock<GeneratedTestClass> writingBlock = new ActionBlock<GeneratedTestClass>(
+               ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
 
-                    readingBlock.Complete();
-                    //writingBlock.Completion.Wait();
-                }, TaskCreationOptions.AttachedToParent);
+            readingBlock.LinkTo(producingBlock, linkOptions);
+            producingBlock.LinkTo(writingBlock, linkOptions);
+
+            foreach (string path in source)
+            {
+               readingBlock.SendAsync(path);
+            }
+
+            readingBlock.Complete();
+
+            return writingBlock.Completion;
         }
 
         private GeneratedTestClass Produce(string sourceCode)

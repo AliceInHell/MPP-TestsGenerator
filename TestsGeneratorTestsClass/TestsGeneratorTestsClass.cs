@@ -48,10 +48,7 @@ namespace TestsGeneratorUnitTests
             _writer = new CodeWriter(_outputDirectory);
 
             _generator = new TestsGenerator(_config);
-            _task = _generator.Generate(_reader, _writer, _paths);
-
-            _task.Start();
-            _task.Wait();
+            _generator.Generate(_reader, _writer, _paths).Wait();
 
             _programmText = File.ReadAllText("./SomeClassTests.cs");
             SyntaxTree syntaxTree;
