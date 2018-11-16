@@ -10,11 +10,10 @@ namespace TestsGeneratorLibrary
     {
         public async Task<string> ReadAsync(string path)
         {
-            StreamReader sr = new StreamReader(path); 
-            string result = await sr.ReadToEndAsync();
-
-            sr.Close();
-            return result;         
+            using (StreamReader sr = new StreamReader(path))
+            {
+                return await sr.ReadToEndAsync();
+            }      
         }
     }
 }

@@ -25,11 +25,10 @@ namespace TestsGeneratorLibrary
         public async Task WriteAsync(GeneratedTestClass generatedCode)
         {
             string filePath = $"{_outputDirectoryPath}\\{generatedCode.TestClassName}";
-            StreamWriter sw = new StreamWriter(filePath);
-
-            await sw.WriteAsync(generatedCode.TestClassData);
-
-            sw.Close();
+            using (StreamWriter sw = new StreamWriter(filePath))
+            {
+                await sw.WriteAsync(generatedCode.TestClassData);
+            }            
         }
     }
 }
