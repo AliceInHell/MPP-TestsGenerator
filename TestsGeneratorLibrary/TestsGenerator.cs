@@ -44,7 +44,7 @@ namespace TestsGeneratorLibrary
                     }
 
                     readingBlock.Complete();
-                    writingBlock.Completion.Wait();
+                    //writingBlock.Completion.Wait();
                 }, TaskCreationOptions.AttachedToParent);
         }
 
