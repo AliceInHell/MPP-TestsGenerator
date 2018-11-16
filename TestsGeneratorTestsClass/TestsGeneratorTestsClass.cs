@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestsGeneratorLibrary;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace TestsGeneratorUnitTests
 {
@@ -26,14 +25,13 @@ namespace TestsGeneratorUnitTests
         private CodeReader _reader;
         private CodeWriter _writer;
 
-        private TestsGenerator _generator;
-        private Task _task;
+        private TestsGenerator _generator;      
 
         private CompilationUnitSyntax _compilationUnitSyntax;
 
         [TestInitialize]
         public void SetUp()
-        {
+        {            
             _readingTasksCount = 3;
             _writingTasksCount = 3;
             _config = new TestGeneratorConfig(_readingTasksCount, _writingTasksCount);
@@ -41,15 +39,15 @@ namespace TestsGeneratorUnitTests
             _outputDirectory = "./";
 
             _paths = new List<string>();
-            _paths.Add("./SomeClass.csSource");
             _paths.Add("./AnotherClass.csSource");
+            _paths.Add("./SomeClass.csSource");
 
             _reader = new CodeReader();
             _writer = new CodeWriter(_outputDirectory);
 
             _generator = new TestsGenerator(_config);
             _generator.Generate(_reader, _writer, _paths).Wait();
-
+            
             _programmText = File.ReadAllText("./SomeClassTests.cs");
             SyntaxTree syntaxTree;
             syntaxTree = CSharpSyntaxTree.ParseText(_programmText);
@@ -80,6 +78,16 @@ namespace TestsGeneratorUnitTests
         }
 
         [TestMethod]
+        public void TSomeClassMethodsCountTest()
+        {
+            IEnumerable<MethodDeclarationSyntax> methods =
+                from methodDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                select methodDeclaration;
+
+            Assert.IsTrue(methods.Count() == 3);
+        }
+
+        [TestMethod]
         public void SomeClassNameTest()
         {
             IEnumerable<ClassDeclarationSyntax> className =
@@ -90,17 +98,7 @@ namespace TestsGeneratorUnitTests
             Assert.IsNotNull(className.FirstOrDefault());
         }
 
-        [TestMethod]
-        public void TSomeClassMethodsCountTest()
-        {
-            IEnumerable<MethodDeclarationSyntax> methods =
-                from methodDeclaration in _compilationUnitSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
-                select methodDeclaration;
 
-            Assert.IsTrue(methods.Count() == 3);
-        }
-
-        
         [TestMethod]
         public void SecondMethodAssertFailTest()
         {

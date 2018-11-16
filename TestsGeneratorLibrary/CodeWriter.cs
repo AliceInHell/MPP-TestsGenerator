@@ -22,19 +22,14 @@ namespace TestsGeneratorLibrary
             }
         }
 
-        public void Consume(GeneratedTestClass @class)
+        public async Task WriteAsync(GeneratedTestClass generatedCode)
         {
-            string filePath = filePath = $"{_outputDirectoryPath}\\{@class.TestClassName}";
+            string filePath = $"{_outputDirectoryPath}\\{generatedCode.TestClassName}";
+            StreamWriter sw = new StreamWriter(filePath);
 
-            Exception error = null;
-            try
-            {
-                File.WriteAllText(filePath, @class.TestClassData);
-            }
-            catch (Exception exception)
-            {
-                error = exception;
-            }
+            await sw.WriteAsync(generatedCode.TestClassData);
+
+            sw.Close();
         }
     }
 }

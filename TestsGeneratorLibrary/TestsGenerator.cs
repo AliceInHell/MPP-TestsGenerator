@@ -25,13 +25,13 @@ namespace TestsGeneratorLibrary
             ExecutionDataflowBlockOptions outputTaskRestriction = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _testsGeneratorConfig.MaxWritingTasksCount };
 
             TransformBlock<string, string> readingBlock =
-                new TransformBlock<string, string>(new Func<string, string>(reader.ProvideCode), processingTaskRestriction);
+                new TransformBlock<string, string>(new Func<string, Task<string>>(reader.ReadAsync), processingTaskRestriction);
 
             TransformBlock<string, GeneratedTestClass> producingBlock =
                 new TransformBlock<string, GeneratedTestClass>(new Func<string, GeneratedTestClass>(Produce), processingTaskRestriction);
 
             ActionBlock<GeneratedTestClass> writingBlock = new ActionBlock<GeneratedTestClass>(
-               ((generatedClass) => writer.Consume(generatedClass)), outputTaskRestriction);
+               ((generatedClass) => writer.WriteAsync(generatedClass).Wait()), outputTaskRestriction);
 
             readingBlock.LinkTo(producingBlock, linkOptions);
             producingBlock.LinkTo(writingBlock, linkOptions);

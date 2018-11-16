@@ -8,9 +8,13 @@ namespace TestsGeneratorLibrary
 {
     public class CodeReader
     {
-        public string ProvideCode(string path)
+        public async Task<string> ReadAsync(string path)
         {
-            return File.ReadAllText(path);
+            StreamReader sr = new StreamReader(path); 
+            string result = await sr.ReadToEndAsync();
+
+            sr.Close();
+            return result;         
         }
     }
 }
