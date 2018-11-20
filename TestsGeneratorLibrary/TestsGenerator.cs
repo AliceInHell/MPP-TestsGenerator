@@ -17,7 +17,7 @@ namespace TestsGeneratorLibrary
             _testsGeneratorConfig = testsGeneratorConfig;
         }
 
-        public Task Generate(CodeReader reader, CodeWriter writer, List<string> source)
+        public async Task Generate(CodeReader reader, CodeWriter writer, List<string> source)
         {
 
             DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
@@ -38,12 +38,12 @@ namespace TestsGeneratorLibrary
 
             foreach (string path in source)
             {
-               readingBlock.SendAsync(path);
+               await readingBlock.SendAsync(path);
             }
 
             readingBlock.Complete();
 
-            return writingBlock.Completion;
+            await writingBlock.Completion;
         }
 
         private GeneratedTestClass Produce(string sourceCode)
