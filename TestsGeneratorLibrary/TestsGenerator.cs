@@ -38,7 +38,7 @@ namespace TestsGeneratorLibrary
 
             foreach (string path in source)
             {
-               await readingBlock.SendAsync(path);
+               readingBlock.Post(path);
             }
 
             readingBlock.Complete();
