@@ -8,15 +8,32 @@ using TestsGeneratorLibrary.Structures;
 
 namespace TestsGeneratorLibrary
 {
+    /// <summary>
+    /// Class that produce tests generation.
+    /// </summary>
     public class TestsGenerator
     {
+        /// <summary>
+        /// TestsGenerator's configuration.
+        /// </summary>
         private readonly TestGeneratorConfig _testsGeneratorConfig;        
 
+        /// <summary>
+        /// Initializes a new instance of a <see cref="TestsGenerator"/> class.
+        /// </summary>
+        /// <param name="testsGeneratorConfig"></param>
         public TestsGenerator(TestGeneratorConfig testsGeneratorConfig)
         {
             _testsGeneratorConfig = testsGeneratorConfig;
         }
 
+        /// <summary>
+        /// Generate tests classes.
+        /// </summary>
+        /// <param name="reader">File reader.</param>
+        /// <param name="writer">File writer.</param>
+        /// <param name="source">Paths to files.</param>
+        /// <returns></returns>
         public async Task Generate(CodeReader reader, CodeWriter writer, List<string> source)
         {
 
@@ -46,6 +63,11 @@ namespace TestsGeneratorLibrary
             await writingBlock.Completion;
         }
 
+        /// <summary>
+        /// Generate test class.
+        /// </summary>
+        /// <param name="sourceCode">Some class code.</param>
+        /// <returns>Generated test.</returns>
         private GeneratedTestClass Produce(string sourceCode)
         {
             SyntaxTreeInfoBuilder syntaxTreeInfoBuilder = new SyntaxTreeInfoBuilder(sourceCode);
