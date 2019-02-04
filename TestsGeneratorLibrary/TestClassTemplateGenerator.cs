@@ -8,15 +8,29 @@ using TestsGeneratorLibrary.Structures;
 
 namespace TestsGeneratorLibrary
 {
+    /// <summary>
+    /// Generate class code using roslyn.
+    /// </summary>
     internal class TestClassTemplateGenerator
     {
+        /// <summary>
+        /// Class syntax tree.
+        /// </summary>
         private readonly SyntaxTreeInfo _syntaxTreeInfo;
 
+        /// <summary>
+        /// Initializes a new instance of a <see cref="TestClassTemplateGenerator"/> class.
+        /// </summary>
+        /// <param name="syntaxTreeInfo"></param>
         public TestClassTemplateGenerator(SyntaxTreeInfo syntaxTreeInfo)
         {
             _syntaxTreeInfo = syntaxTreeInfo;
         }
 
+        /// <summary>
+        /// Generate test template.
+        /// </summary>
+        /// <returns>Generated classes.</returns>
         public IEnumerable<GeneratedTestClass> GetTestTemplates()
         {
             List<GeneratedTestClass> testTemplates = new List<GeneratedTestClass>();
@@ -48,6 +62,11 @@ namespace TestsGeneratorLibrary
             return testTemplates;
         }
 
+        /// <summary>
+        /// Parse using directives.
+        /// </summary>
+        /// <param name="classInfo">Class inforation.</param>
+        /// <returns></returns>
         private SyntaxList<UsingDirectiveSyntax> GetUsingDirectives(ClassInfo classInfo)
         {
             List<UsingDirectiveSyntax> usingDirectives = new List<UsingDirectiveSyntax>
@@ -75,6 +94,11 @@ namespace TestsGeneratorLibrary
             return List(usingDirectives);
         }
 
+        /// <summary>
+        /// Parse class members.
+        /// </summary>
+        /// <param name="classInfo">Class information.</param>
+        /// <returns>Syntax tree.</returns>
         private SyntaxList<MemberDeclarationSyntax> GetClassMembers(ClassInfo classInfo)
         {
             List<MemberDeclarationSyntax> classMembers = new List<MemberDeclarationSyntax>();            
@@ -87,6 +111,13 @@ namespace TestsGeneratorLibrary
             return List(classMembers);
         }
 
+        /// <summary>
+        /// Parse method declaration.
+        /// </summary>
+        /// <param name="attributeName">Atribute.</param>
+        /// <param name="methodName">Method name.</param>
+        /// <param name="blockMembers">Block members.</param>
+        /// <returns>Method declaration.</returns>
         private MethodDeclarationSyntax GetMethodDeclaration(string attributeName, string methodName, SyntaxList<StatementSyntax> blockMembers)
         {
             MethodDeclarationSyntax methodDeclaration = MethodDeclaration(
@@ -105,6 +136,11 @@ namespace TestsGeneratorLibrary
             return methodDeclaration;
         }        
 
+        /// <summary>
+        /// Parse method declaration.
+        /// </summary>
+        /// <param name="methodInfo">Method information.</param>
+        /// <returns>Method declaration.</returns>
         private MethodDeclarationSyntax GetTestMethodDeclaration(MethodInfo methodInfo)
         {
             List<StatementSyntax> blockMembers = new List<StatementSyntax>();
@@ -126,6 +162,12 @@ namespace TestsGeneratorLibrary
             return GetMethodDeclaration("TestMethod", $"{methodInfo.Name}Test", List(blockMembers));
         }
 
+        /// <summary>
+        /// Parse method expression.
+        /// </summary>
+        /// <param name="objectName">Object name.</param>
+        /// <param name="memberName">Member name.</param>
+        /// <returns>Method access expression.</returns>
         private MemberAccessExpressionSyntax GetMemberAccessExpression(string objectName, string memberName)
         {
             return MemberAccessExpression(
